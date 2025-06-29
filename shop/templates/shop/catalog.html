@@ -1,0 +1,81 @@
+{% extends 'shop/base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h1>Каталог</h1>
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <h5>Категории</h5>
+      <ul class="list-group">
+        {% for cat in categories %}
+          <li class="list-group-item {% if category and category.id == cat.id %}active{% endif %}">
+            <a href="/catalog/{{ cat.slug }}/" class="text-decoration-none {% if category and category.id == cat.id %}text-white{% endif %}">
+              <strong>{{ cat.name }}</strong>
+            </a>
+            {% if cat.children.all %}
+              <ul class="list-group ms-3 mt-2">
+                {% for subcat in cat.children.all %}
+                  <li class="list-group-item {% if category and category.id == subcat.id %}active{% endif %}">
+                    <a href="/catalog/{{ subcat.slug }}/" class="text-decoration-none {% if category and category.id == subcat.id %}text-white{% endif %}">
+                      {{ subcat.name }}
+                    </a>
+                    {% if subcat.children.all %}
+                      <ul class="list-group ms-3 mt-2">
+                        {% for subsubcat in subcat.children.all %}
+                          <li class="list-group-item {% if category and category.id == subsubcat.id %}active{% endif %}">
+                            <a href="/catalog/{{ subsubcat.slug }}/" class="text-decoration-none {% if category and category.id == subsubcat.id %}text-white{% endif %}">
+                              <small>{{ subsubcat.name }}</small>
+                            </a>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    {% endif %}
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="col-md-9">
+      {% if category %}
+        <h3>{{ category.name }}</h3>
+        {% if category.children.all %}
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5>Подкатегории:</h5>
+              <div class="row">
+                {% for subcat in category.children.all %}
+                  <div class="col-md-4 mb-2">
+                    <a href="/catalog/{{ subcat.slug }}/" class="btn btn-outline-primary btn-sm">
+                      {{ subcat.name }}
+                    </a>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endif %}
+      <div class="row">
+        {% for product in products %}
+          <div class="col-md-4 mb-4">
+            <div class="card h-100">
+              {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+              {% endif %}
+              <div class="card-body">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <p class="card-text">{{ product.price }} ₽</p>
+                <small class="text-muted">{{ product.category.name }}</small>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <p>Нет товаров в этой категории.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 
