@@ -1,3 +1,9 @@
 /.mypy_cache
 /venv
 /.vscode
+/init_seo.py
+/import_media_files.pu
+/db.sqlite3
+/create_test_data.py
+/create_static_pages.py
+/add_seo_data.py
