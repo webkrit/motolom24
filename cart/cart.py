@@ -33,13 +33,15 @@ class Cart:
         product_id = str(product.id)
         if product_id in self.cart:
             del self.cart[product_id]
-            self.session['cart'] = dict(self.cart)
+            self.cart = dict(self.cart)
+            self.session['cart'] = self.cart
             self.session.modified = True
 
     def clear(self):
         """Очистить корзину."""
+        self.cart = {}
         self.session['cart'] = {}
-        self.save()
+        self.session.modified = True
 
     def save(self):
         """Синхронизировать корзину с сессией и пометить сессию как изменённую."""
