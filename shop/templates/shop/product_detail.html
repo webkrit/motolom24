@@ -1,0 +1,121 @@
+{% extends 'shop/base.html' %}
+{% load menu_tags %}
+{% block title %}{{ meta_title }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Главная</a></li>
+      <li class="breadcrumb-item"><a href="/catalog/">Каталог</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+    </ol>
+  </nav>
+  <div class="row">
+    <div class="col-md-5">
+      <div id="productGallery" class="mb-3">
+        {% if product.image and product.image|has_file or product.images.all %}
+          {% if product.image and product.image|has_file %}
+            <a href="{{ product.image.url }}" class="glightbox" data-gallery="product" data-title="{{ product.name }}" id="mainImageLink">
+              <img id="mainProductImage" src="{{ product.image.url }}" class="img-fluid rounded border mb-2 shadow-sm main-gallery-img" alt="{{ product.name }}">
+            </a>
+          {% elif product.images.all %}
+            <a href="{{ product.images.first.image.url }}" class="glightbox" data-gallery="product" data-title="{{ product.name }}" id="mainImageLink">
+              <img id="mainProductImage" src="{{ product.images.first.image.url }}" class="img-fluid rounded border mb-2 shadow-sm main-gallery-img" alt="{{ product.name }}">
+            </a>
+          {% endif %}
+          <div class="d-flex flex-wrap gap-2 mt-2">
+            {% if product.image and product.image|has_file %}
+              <img src="{{ product.image.url }}" class="img-thumbnail gallery-thumb border shadow-sm" style="width:64px; height:64px; object-fit:cover; cursor:pointer;" onclick="switchMainImage('{{ product.image.url }}')">
+            {% endif %}
+            {% for img in product.images.all %}
+              {% if img.image and img.image|has_file %}
+                <img src="{{ img.image.url }}" class="img-thumbnail gallery-thumb border shadow-sm" style="width:64px; height:64px; object-fit:cover; cursor:pointer;" onclick="switchMainImage('{{ img.image.url }}')">
+              {% endif %}
+            {% endfor %}
+          </div>
+          <!-- Скрытые ссылки для GLightbox -->
+          <div style="display:none;">
+            {% if product.image and product.image|has_file %}
+              <a href="{{ product.image.url }}" class="glightbox" data-gallery="product" data-title="{{ product.name }}"></a>
+            {% endif %}
+            {% for img in product.images.all %}
+              {% if img.image and img.image|has_file %}
+                <a href="{{ img.image.url }}" class="glightbox" data-gallery="product" data-title="{{ product.name }}"></a>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="bg-light border rounded text-center py-5">Нет фото</div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-md-7">
+      <h1 class="mb-3">{{ product.name }}</h1>
+      <div class="mb-2 text-muted">Категория: {{ product.category.name }}</div>
+      <div class="h4 text-success mb-3">{{ product.price }} ₽</div>
+      <div class="mb-2"><small>Остаток: {{ product.quantity }}</small></div>
+      <div class="mb-4">{{ product.description|linebreaks }}</div>
+      {% if product.quantity > 0 and product.available %}
+      <form method="post" action="{% url 'cart_add' product.id %}" class="mb-3 d-flex align-items-center gap-2">
+        {% csrf_token %}
+        <div class="input-group" style="max-width: 120px;">
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="changeQty(this, -1)">-</button>
+          <input type="number" name="quantity" value="1" min="1" max="{{ product.quantity }}" class="form-control form-control-sm text-center" style="width: 50px;" oninput="validateQty(this)">
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="changeQty(this, 1)">+</button>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16" style="vertical-align:middle; margin-right:6px;"><path d="M0 1.5A.5.5 0 0 1 .5 1h1a.5.5 0 0 1 .485.379L2.89 5H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 14H4a.5.5 0 0 1-.491-.408L1.01 2H.5a.5.5 0 0 1-.5-.5zm3.14 4l1.25 6h7.22l1.25-6H3.14zM5.5 12a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm6 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>
+          В корзину
+        </button>
+      </form>
+      <script>
+      function changeQty(btn, delta) {
+        var input = btn.parentElement.querySelector('input[name="quantity"]');
+        var min = parseInt(input.min) || 1;
+        var max = parseInt(input.max) || 99;
+        var val = parseInt(input.value) || min;
+        val += delta;
+        if (val < min) val = min;
+        if (val > max) val = max;
+        input.value = val;
+      }
+      function validateQty(input) {
+        var min = parseInt(input.min) || 1;
+        var max = parseInt(input.max) || 99;
+        var val = parseInt(input.value) || min;
+        if (val < min) val = min;
+        if (val > max) val = max;
+        input.value = val;
+      }
+      </script>
+      {% else %}
+      <button class="btn btn-secondary btn-lg w-100" disabled>Товар заказан</button>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<!-- GLightbox -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+<script>
+var lightbox = GLightbox({selector: '.glightbox'});
+function openGallery(index) {
+  lightbox.openAt(index);
+}
+function switchMainImage(url) {
+  const mainImg = document.getElementById('mainProductImage');
+  const mainLink = document.getElementById('mainImageLink');
+  mainImg.src = url;
+  mainLink.href = url;
+}
+</script>
+<style>
+.main-gallery-img {
+  height: 400px;
+  width: 100%;
+  object-fit: contain;
+  background: #f8f9fa;
+  display: block;
+}
+</style>
+{% endblock %} 

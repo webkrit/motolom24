@@ -37,10 +37,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'shop',
     'accounts',
     'crispy_forms',
     'crispy_bootstrap5',
+    'ckeditor',
+    'ckeditor_uploader',
+    'seo',
+    'media_manager',
+    'cart',
 ]
 
 MIDDLEWARE = [
@@ -65,6 +71,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'shop.views.footer_settings',
+                'shop.views.site_settings',
             ],
         },
     },
@@ -134,3 +142,50 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
+
+# CKEditor настройки
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Image', 'UploadImage', 'Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+            ['Link', 'Unlink'],
+            ['RemoveFormat', 'Source'],
+            ['Format', 'Font', 'FontSize'],
+            ['TextColor', 'BGColor'],
+            ['Table', 'HorizontalRule', 'Smiley', 'SpecialChar'],
+        ],
+        'height': 400,
+        'width': '100%',
+        'extraPlugins': ','.join([
+            'uploadimage', 'image2', 'autolink', 'autoembed', 'embedsemantic',
+            'autogrow', 'widget', 'lineutils', 'clipboard', 'dialog', 'dialogui', 'elementspath'
+        ]),
+    },
+    'bootstrap': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Image', 'UploadImage', 'Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'],
+            ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+            ['Link', 'Unlink'],
+            ['RemoveFormat', 'Source'],
+            ['Format', 'Font', 'FontSize'],
+            ['TextColor', 'BGColor'],
+            ['Table', 'HorizontalRule'],
+        ],
+        'height': 300,
+        'width': '100%',
+        'removePlugins': 'stylesheetparser',
+        'allowedContent': True,
+        'extraPlugins': ','.join([
+            'uploadimage', 'image2', 'autolink', 'autoembed', 'embedsemantic',
+            'autogrow', 'widget', 'lineutils', 'clipboard', 'dialog', 'dialogui', 'elementspath'
+        ]),
+    }
+}
+
+SITE_ID = 1
+
+CKEDITOR_UPLOAD_PATH = 'uploads/'

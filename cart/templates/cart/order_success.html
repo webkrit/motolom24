@@ -1,0 +1,11 @@
+{% extends 'shop/base.html' %}
+{% block title %}Заказ оформлен{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="alert alert-success mt-4">
+    <h2>Спасибо! Ваш заказ №{{ order.id }} успешно оформлен.</h2>
+    <p>Мы свяжемся с вами для подтверждения заказа.</p>
+    <a href="/" class="btn btn-primary mt-3">На главную</a>
+  </div>
+</div>
+{% endblock %} 

@@ -1,36 +1,69 @@
 {% extends 'shop/base.html' %}
 {% block content %}
 <div class="container mt-4">
-  <h1>Все товары</h1>
+  <!-- Слайдер баннеров -->
+  {% if banners %}
+  <div id="mainBannerCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      {% for banner in banners %}
+      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+        {% if banner.link %}
+        <a href="{{ banner.link }}" target="_blank">
+          <img src="{{ banner.image.url }}" class="d-block w-100" alt="{{ banner.title }}">
+        </a>
+        {% else %}
+        <img src="{{ banner.image.url }}" class="d-block w-100" alt="{{ banner.title }}">
+        {% endif %}
+        {% if banner.title %}
+        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
+          <h5>{{ banner.title }}</h5>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#mainBannerCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#mainBannerCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+  {% endif %}
+
+  <!-- Последние поступления -->
+  <h2 class="mb-3">Последние поступления</h2>
   <div class="row">
-    {% for product in page_obj %}
+    {% for product in products %}
       <div class="col-md-3 mb-4">
         <div class="card h-100">
-          {% if product.image %}
-            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
-          {% endif %}
+          <a href="{% url 'product_detail' slug=product.slug %}">
+            {% if product.image %}
+              <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+            {% endif %}
+          </a>
           <div class="card-body">
-            <h5 class="card-title">{{ product.name }}</h5>
+            <h5 class="card-title">
+              <a href="{% url 'product_detail' slug=product.slug %}">{{ product.name }}</a>
+            </h5>
             <p class="card-text">{{ product.price }} ₽</p>
           </div>
         </div>
       </div>
     {% endfor %}
   </div>
-  <nav>
-    <ul class="pagination">
-      {% if page_obj.has_previous %}
-        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Назад</a></li>
-      {% endif %}
-      {% for num in page_obj.paginator.page_range %}
-        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
-          <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-        </li>
-      {% endfor %}
-      {% if page_obj.has_next %}
-        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Вперёд</a></li>
-      {% endif %}
-    </ul>
-  </nav>
+
+  <!-- Текстовый блок -->
+  {% if main_settings.text_block %}
+  <div class="mt-5">
+    <div class="card">
+      <div class="card-body">
+        {{ main_settings.text_block|safe }}
+      </div>
+    </div>
+  </div>
+  {% endif %}
 </div>
 {% endblock %} 

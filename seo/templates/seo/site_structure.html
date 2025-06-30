@@ -1,0 +1,152 @@
+{% extends 'admin/base_site.html' %}
+{% load static %}
+
+{% block title %}Структура сайта - SEO Управление{% endblock %}
+
+{% block extrastyle %}
+<style>
+    .structure-container {
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin: 20px 0;
+    }
+    .structure-item {
+        margin: 10px 0;
+        padding: 10px;
+        background: white;
+        border-left: 4px solid #007bff;
+        border-radius: 4px;
+    }
+    .structure-item.level-1 {
+        border-left-color: #007bff;
+        margin-left: 0;
+    }
+    .structure-item.level-2 {
+        border-left-color: #28a745;
+        margin-left: 20px;
+    }
+    .structure-item.level-3 {
+        border-left-color: #ffc107;
+        margin-left: 40px;
+    }
+    .structure-item.level-4 {
+        border-left-color: #dc3545;
+        margin-left: 60px;
+    }
+    .url-info {
+        color: #6c757d;
+        font-size: 0.9em;
+        margin-top: 5px;
+    }
+    .seo-info {
+        background: #e9ecef;
+        padding: 8px;
+        border-radius: 4px;
+        margin-top: 8px;
+        font-size: 0.85em;
+    }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .stat-number {
+        font-size: 2em;
+        font-weight: bold;
+        color: #007bff;
+    }
+    .stat-label {
+        color: #6c757d;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="structure-container">
+    <h1>Структура сайта motolom24</h1>
+    
+    <!-- Статистика -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_categories }}</div>
+            <div class="stat-label">Категорий</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_products }}</div>
+            <div class="stat-label">Товаров</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_pages }}</div>
+            <div class="stat-label">Страниц</div>
+        </div>
+    </div>
+    
+    <!-- Главная страница -->
+    <div class="structure-item level-1">
+        <h3>{{ structure.main_page.title }}</h3>
+        <div class="url-info">URL: {{ structure.main_page.url }}</div>
+    </div>
+    
+    <!-- Каталог -->
+    <div class="structure-item level-1">
+        <h3>{{ structure.catalog.title }}</h3>
+        <div class="url-info">URL: {{ structure.catalog.url }}</div>
+        
+        <!-- Категории 1 уровня -->
+        {% for category in structure.catalog.categories %}
+        <div class="structure-item level-2">
+            <h4>{{ category.name }}</h4>
+            <div class="url-info">URL: {{ category.url }}</div>
+            
+            <!-- Категории 2 уровня -->
+            {% for subcategory in category.children %}
+            <div class="structure-item level-3">
+                <h5>{{ subcategory.name }}</h5>
+                <div class="url-info">URL: {{ subcategory.url }}</div>
+                
+                <!-- Категории 3 уровня -->
+                {% for subsubcategory in subcategory.children %}
+                <div class="structure-item level-4">
+                    <h6>{{ subsubcategory.name }}</h6>
+                    <div class="url-info">URL: {{ subsubcategory.url }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Статичные страницы -->
+    <h3>Статичные страницы</h3>
+    {% for page in structure.static_pages %}
+    <div class="structure-item level-1">
+        <h4>{{ page.name }}</h4>
+        <div class="url-info">URL: {{ page.url }}</div>
+    </div>
+    {% endfor %}
+    
+    <!-- SEO файлы -->
+    <h3>SEO файлы</h3>
+    <div class="structure-item level-1">
+        <h4>Sitemap.xml</h4>
+        <div class="url-info">URL: /sitemap.xml</div>
+        <div class="seo-info">Карта сайта для поисковых систем</div>
+    </div>
+    <div class="structure-item level-1">
+        <h4>Robots.txt</h4>
+        <div class="url-info">URL: /robots.txt</div>
+        <div class="seo-info">Инструкции для поисковых роботов</div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,75 @@
+{% extends 'shop/base.html' %}
+{% block title %}Корзина{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h1 class="mb-4">Корзина</h1>
+  {% if cart|length == 0 %}
+    <div class="alert alert-info">Ваша корзина пуста.</div>
+  {% else %}
+    <form method="post" action="{% url 'cart_detail' %}">
+      {% csrf_token %}
+      <table class="table table-bordered align-middle">
+        <thead>
+          <tr>
+            <th>Товар</th>
+            <th>Цена</th>
+            <th>Количество</th>
+            <th>Сумма</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart %}
+          <tr>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.product.price }} ₽</td>
+            <td style="min-width:120px;">
+              <div class="input-group input-group-sm">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="changeQty(this, -1)">-</button>
+                <input type="number" name="quantity_{{ item.product.id }}" value="{{ item.quantity }}" min="1" max="{{ item.product.quantity }}" class="form-control form-control-sm text-center" style="width: 50px;" oninput="validateQty(this)">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="changeQty(this, 1)">+</button>
+              </div>
+            </td>
+            <td>{{ item.total_price }} ₽</td>
+            <td>
+              <form method="post" action="{% url 'cart_remove' item.product.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="mb-3">
+        <strong>Итого: {{ cart.get_total_price }} ₽</strong>
+      </div>
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-outline-primary">Обновить корзину</button>
+        <a href="{% url 'cart_clear' %}" class="btn btn-outline-secondary">Очистить корзину</a>
+        <a href="{% url 'order_create' %}" class="btn btn-primary">Оформить заказ</a>
+      </div>
+    </form>
+    <script>
+    function changeQty(btn, delta) {
+      var input = btn.parentElement.querySelector('input[type="number"]');
+      var min = parseInt(input.min) || 1;
+      var max = parseInt(input.max) || 99;
+      var val = parseInt(input.value) || min;
+      val += delta;
+      if (val < min) val = min;
+      if (val > max) val = max;
+      input.value = val;
+    }
+    function validateQty(input) {
+      var min = parseInt(input.min) || 1;
+      var max = parseInt(input.max) || 99;
+      var val = parseInt(input.value) || min;
+      if (val < min) val = min;
+      if (val > max) val = max;
+      input.value = val;
+    }
+    </script>
+  {% endif %}
+</div>
+{% endblock %} 

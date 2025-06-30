@@ -3,27 +3,140 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>motolom24</title>
+  <title>{% block title %}{% if meta_title %}{{ meta_title }}{% else %}motolom24{% endif %}{% endblock %}</title>
+  
+  {% if meta_description %}
+  <meta name="description" content="{{ meta_description }}">
+  {% endif %}
+  
+  {% if meta_keywords %}
+  <meta name="keywords" content="{{ meta_keywords }}">
+  {% endif %}
+  
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+  .gallery-thumb {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+  }
+  </style>
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
+  {% load static %}
+  {% load menu_tags %}
+  {% if messages %}
+  <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+    {% for message in messages %}
+      <div class="toast align-items-center {% if message.tags == 'error' %}text-bg-danger{% else %}text-bg-success{% endif %} border-0 show mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body">
+            {{ message }}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+      toastElList.forEach(function(toastEl) {
+        new bootstrap.Toast(toastEl, {delay: 2500}).show();
+      });
+    });
+  </script>
+  {% endif %}
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-      <a class="navbar-brand" href="/">motolom24</a>
+      <a class="navbar-brand d-flex align-items-center" href="/">
+        {% if site_settings.logo %}
+          <img src="{{ site_settings.logo.url }}" alt="Логотип" style="background: transparent; max-height:48px; width:auto; display:inline-block; vertical-align:middle;">
+        {% else %}
+          motolom24
+        {% endif %}
+      </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="/catalog/">Каталог</a></li>
-          <li class="nav-item"><a class="nav-link" href="/conditions/">Условия и доставка</a></li>
-          <li class="nav-item"><a class="nav-link" href="/buyout/">Выкуп мотоциклов</a></li>
-          <li class="nav-item"><a class="nav-link" href="/contacts/">Контакты</a></li>
+          {% get_menu as menu_items %}
+          {% for item in menu_items %}
+            {% if not item.parent %}
+              {% with children=item.children.all %}
+                {% if children %}
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="{{ item.url }}" id="menuDropdown{{ item.id }}" role="button" data-bs-toggle="dropdown" aria-expanded="false" {% if item.new_tab %}target="_blank"{% endif %}>{{ item.title }}</a>
+                    <ul class="dropdown-menu" aria-labelledby="menuDropdown{{ item.id }}">
+                      {% for child in children %}
+                        <li><a class="dropdown-item" href="{{ child.url }}" {% if child.new_tab %}target="_blank"{% endif %}>{{ child.title }}</a></li>
+                      {% endfor %}
+                    </ul>
+                  </li>
+                {% else %}
+                  <li class="nav-item"><a class="nav-link" href="{{ item.url }}" {% if item.new_tab %}target="_blank"{% endif %}>{{ item.title }}</a></li>
+                {% endif %}
+              {% endwith %}
+            {% endif %}
+          {% endfor %}
+        </ul>
+        <ul class="navbar-nav ms-2">
+          <li class="nav-item">
+            <a class="btn btn-primary position-relative d-flex align-items-center" href="{% url 'cart_detail' %}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-cart me-1" viewBox="0 0 16 16">
+                <path d="M0 1.5A.5.5 0 0 1 .5 1h1a.5.5 0 0 1 .485.379L2.89 5H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 14H4a.5.5 0 0 1-.491-.408L1.01 2H.5a.5.5 0 0 1-.5-.5zm3.14 4l1.25 6h7.22l1.25-6H3.14zM5.5 12a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm6 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+              </svg>
+              <span class="d-none d-lg-inline">Корзина</span>
+              {% if request.session.cart %}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.8em;">{{ request.session.cart|length }}</span>
+              {% endif %}
+            </a>
+          </li>
         </ul>
       </div>
     </div>
   </nav>
-  {% block content %}{% endblock %}
+  <div class="flex-grow-1">
+    {% block content %}{% endblock %}
+  </div>
+  {% with footer=footer_settings %}
+  <footer class="bg-dark text-light mt-5 py-4">
+    <div class="container">
+      {% if footer and footer.text_block %}
+        <div class="footer-content">{{ footer.text_block|safe }}</div>
+      {% else %}
+        <div class="footer-content text-center">&copy; motolom24, {{ now|date:'Y' }}</div>
+      {% endif %}
+    </div>
+  </footer>
+  {% endwith %}
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+  function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+  if (window.CKEDITOR) {
+      CKEDITOR.on('instanceReady', function() {
+          for (var name in CKEDITOR.instances) {
+              CKEDITOR.instances[name].on('fileUploadRequest', function(evt) {
+                  var xhr = evt.data.fileLoader.xhr;
+                  xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+              });
+          }
+      });
+  }
+  </script>
 </body>
 </html> 

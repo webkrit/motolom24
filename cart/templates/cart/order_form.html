@@ -1,0 +1,43 @@
+{% extends 'shop/base.html' %}
+{% block title %}Оформление заказа{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h1 class="mb-4">Оформление заказа</h1>
+  <form method="post">
+    {% csrf_token %}
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label for="phone" class="form-label">Телефон*</label>
+          <input type="text" class="form-control" id="phone" name="phone" required>
+        </div>
+        <div class="mb-3">
+          <label for="name" class="form-label">Имя</label>
+          <input type="text" class="form-control" id="name" name="name">
+        </div>
+        <div class="mb-3">
+          <label for="address" class="form-label">Адрес</label>
+          <input type="text" class="form-control" id="address" name="address">
+        </div>
+        <div class="mb-3">
+          <label for="comment" class="form-label">Комментарий</label>
+          <textarea class="form-control" id="comment" name="comment" rows="2"></textarea>
+        </div>
+        <button type="submit" class="btn btn-success">Оформить заказ</button>
+        <a href="{% url 'cart_detail' %}" class="btn btn-link">Вернуться в корзину</a>
+      </div>
+      <div class="col-md-6">
+        <h5>Ваш заказ:</h5>
+        <ul class="list-group mb-3">
+          {% for item in cart %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ item.product.name }} <span>{{ item.quantity }} x {{ item.product.price }} ₽</span>
+          </li>
+          {% endfor %}
+        </ul>
+        <div class="fw-bold">Итого: {{ cart.get_total_price }} ₽</div>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %} 
