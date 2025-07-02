@@ -33,9 +33,7 @@ class Cart:
         product_id = str(product.id)
         if product_id in self.cart:
             del self.cart[product_id]
-            self.cart = dict(self.cart)
-            self.session['cart'] = self.cart
-            self.session.modified = True
+            self.save()
 
     def clear(self):
         """Очистить корзину."""
