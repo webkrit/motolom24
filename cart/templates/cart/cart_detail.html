@@ -33,10 +33,6 @@
             <td>{{ item.total_price }} ₽</td>
             <td>
               <a href="{% url 'cart_remove' item.product.id %}" class="btn btn-sm btn-danger">Удалить</a>
-              {% comment %} <form method="post" action="{% url 'cart_remove' item.product.id %}" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-danger">Удалить</button> {% endcomment %}
-              </form>
             </td>
           </tr>
           {% endfor %}

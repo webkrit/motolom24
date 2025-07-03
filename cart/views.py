@@ -32,7 +32,6 @@ def cart_add(request, product_id):
     messages.success(request, f'Товар "{product.name}" добавлен в корзину!')
     return redirect(request.META.get('HTTP_REFERER', 'cart_detail'))
 
-# @require_POST
 def cart_remove(request, product_id):
     """Удалить товар из корзины."""
     cart = Cart(request)
